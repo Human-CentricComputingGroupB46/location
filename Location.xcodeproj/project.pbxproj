@@ -6,6 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		18991CDC2F6735B9006C9121 /* SensorKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18991CDA2F6735A6006C9121 /* SensorKit.framework */; };
+		18991CDF2F6735BA006C9121 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18991CD82F673510006C9121 /* CoreMotion.framework */; };
+		18991CE12F6735BC006C9121 /* CoreLocationUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18991CD42F673508006C9121 /* CoreLocationUI.framework */; };
+		18991CE32F6735BE006C9121 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18991CD52F673508006C9121 /* CoreLocation.framework */; };
+		18991CE72F673819006C9121 /* CoreLocationUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18991CD42F673508006C9121 /* CoreLocationUI.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		18991CAE2F673028006C9121 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +35,10 @@
 		18991CA02F673026006C9121 /* Location.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Location.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18991CAD2F673028006C9121 /* LocationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LocationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		18991CB72F673028006C9121 /* LocationUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LocationUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		18991CD42F673508006C9121 /* CoreLocationUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocationUI.framework; path = System/Library/Frameworks/CoreLocationUI.framework; sourceTree = SDKROOT; };
+		18991CD52F673508006C9121 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		18991CD82F673510006C9121 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		18991CDA2F6735A6006C9121 /* SensorKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SensorKit.framework; path = System/Library/Frameworks/SensorKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +64,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				18991CE32F6735BE006C9121 /* CoreLocation.framework in Frameworks */,
+				18991CE12F6735BC006C9121 /* CoreLocationUI.framework in Frameworks */,
+				18991CDC2F6735B9006C9121 /* SensorKit.framework in Frameworks */,
+				18991CDF2F6735BA006C9121 /* CoreMotion.framework in Frameworks */,
+				18991CE72F673819006C9121 /* CoreLocationUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +95,7 @@
 				18991CA22F673026006C9121 /* Location */,
 				18991CB02F673028006C9121 /* LocationTests */,
 				18991CBA2F673028006C9121 /* LocationUITests */,
+				18991CD32F673508006C9121 /* Frameworks */,
 				18991CA12F673026006C9121 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +108,17 @@
 				18991CB72F673028006C9121 /* LocationUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		18991CD32F673508006C9121 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				18991CDA2F6735A6006C9121 /* SensorKit.framework */,
+				18991CD82F673510006C9121 /* CoreMotion.framework */,
+				18991CD52F673508006C9121 /* CoreLocation.framework */,
+				18991CD42F673508006C9121 /* CoreLocationUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

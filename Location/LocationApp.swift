@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import CoreLocation // 导入定位
+import CoreMotion   // 导入运动/气压
 
 @main
 struct LocationApp: App {
