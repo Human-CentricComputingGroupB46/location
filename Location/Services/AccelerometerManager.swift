@@ -1,44 +1,41 @@
 import Foundation
 import CoreMotion
 import Combine
+import simd
 
-// 管理加速度并通过积分估算位移
+// 管理加速度并通过积分估算位移（稳定版）
 class AccelerometerManager: ObservableObject {
     private let motionManager = CMMotionManager()
     
-    // 当前状态
-    @Published var distance: Double = 0.0     // 估算的位移距离 (m)
-    @Published var velocity: Double = 0.0     // 估算的速度 (m/s)
-    @Published var acceleration: CMAcceleration?
+    // MARK: - Published 状态
+    @Published var distance: Double = 0.0         // 一维位移估算
+    @Published var velocity: Double = 0.0         // 一维速度估算
+    @Published var acceleration: CMAcceleration?  // 当前加速度
     
+    @Published var distance3D: Double = 0.0       // 三维欧氏位移
+    @Published var position = SIMD3<Double>(0, 0, 0)  // 三维位置
+    private var velocity3D = SIMD3<Double>(0, 0, 0)   // 三维速度
+    
+    // MARK: - 参数
     private var lastUpdateTime: TimeInterval = 0
+    private let noiseThreshold: Double = 0.05     // g
+    private let velocityDamping: Double = 0.95    // 零速阻尼
     
-    // 用作简易 PID 或阻尼修正，对抗积分漂移
-    // 当加速度较小时，强制速度按比例衰减，避免误差无限累积（类似 P 控制 / ZUPT）
-    private let velocityDamping: Double = 0.95 
-    private let noiseThreshold: Double = 0.05 // 噪声阈值 (g)
-    
-    // 三维空间距离（向量积分）
-    @Published var distance3D: Double = 0.0
-    // 相对三维位置增量
-    private var position = SIMD3<Double>(0, 0, 0)
-    // 相对三维速度增量
-    private var velocity3D = SIMD3<Double>(0, 0, 0)
-    
+    // MARK: - 启动更新
     func startUpdates() {
-        // 使用 DeviceMotion 可以获取剔除重力后的 userAcceleration
-        guard motionManager.isDeviceMotionAvailable else { 
+        guard motionManager.isDeviceMotionAvailable else {
             print("Device motion is not available")
-            return 
+            return
         }
         
-        motionManager.deviceMotionUpdateInterval = 0.02 // 50Hz 采样率提高积分精度
+        motionManager.deviceMotionUpdateInterval = 0.02 // 50Hz
         lastUpdateTime = ProcessInfo.processInfo.systemUptime
-        distance = 0.0
-        velocity = 0.0
-        position = SIMD3<Double>(0, 0, 0)
-        velocity3D = SIMD3<Double>(0, 0, 0)
-        distance3D = 0.0
+        
+        distance = 0
+        velocity = 0
+        position = SIMD3(0,0,0)
+        velocity3D = SIMD3(0,0,0)
+        distance3D = 0
         
         motionManager.startDeviceMotionUpdates(to: .main) { [weak self] data, error in
             guard let self = self, let data = data else { return }
@@ -47,48 +44,50 @@ class AccelerometerManager: ObservableObject {
             let dt = currentTime - self.lastUpdateTime
             self.lastUpdateTime = currentTime
             
-            // 获取用户消除重力后的 3 轴加速度
             let accel = data.userAcceleration
-            self.acceleration = CMAcceleration(x: accel.x, y: accel.y, z: accel.z)
+            self.acceleration = accel
             
-            // 计算三轴合成加速度大小
-            let accelMagnitude = sqrt(accel.x * accel.x + accel.y * accel.y + accel.z * accel.z)
-            
-            // 1. 滤除微小噪声
-            var effectiveAccel = 0.0
-            if accelMagnitude > self.noiseThreshold {
-                effectiveAccel = accelMagnitude - self.noiseThreshold
+            // 1. 噪声滤波 & g -> m/s^2 转换
+            func applyThreshold(_ value: Double) -> Double {
+                if abs(value) > self.noiseThreshold {
+                    return (abs(value) - self.noiseThreshold) * (value >= 0 ? 1 : -1) 
+                }
+                return 0
             }
             
-            // 将加速度从 g 转换为 m/s^2
-            let accelerationInMetersPerSecondSquare = effectiveAccel * 9.81
+            let ax = applyThreshold(accel.x)
+            let ay = applyThreshold(accel.y)
+            let az = applyThreshold(accel.z)
             
-            // 2. 积分计算速度 (v = v0 + a * dt)
-            self.velocity += accelerationInMetersPerSecondSquare * dt/2
+            let accelMagnitude = sqrt(ax*ax + ay*ay + az*az)
             
-            // 3维向量计算
-            if accelMagnitude > self.noiseThreshold {
-                self.velocity3D.x += accel.x * 9.81 * dt
-                self.velocity3D.y += accel.y * 9.81 * dt
-                self.velocity3D.z += accel.z * 9.81 * dt
-            }
-            
-            // // 3. 仿 PID (P反馈) 及零速更新 (ZUPT)
-            // // 当检测到没有明显运动时，强制逐渐收敛速度至0，消除长期累积漂移
-            // if effectiveAccel == 0.0 {
-            //     self.velocity *= self.velocityDamping
-            //     self.velocity3D *= self.velocityDamping
-            // }
-            
-            // 4. 积分计算位移 (s = s0 + v * dt)
+            // 2. 一维速度积分（沿加速度模方向）
+            self.velocity += accelMagnitude * dt
             self.distance += self.velocity * dt
             
-            self.position.x += self.velocity3D.x * dt
-            self.position.y += self.velocity3D.y * dt
-            self.position.z += self.velocity3D.z * dt
+            // 3. 三维速度半步积分
+            let vxNew = self.velocity3D.x + ax * dt
+            let vyNew = self.velocity3D.y + ay * dt
+            let vzNew = self.velocity3D.z + az * dt
             
-            // 计算三维空间欧氏距离
-            self.distance3D = sqrt(pow(self.position.x, 2) + pow(self.position.y, 2) + pow(self.position.z, 2))
+            self.position.x += (self.velocity3D.x + vxNew)/2 * dt
+            self.position.y += (self.velocity3D.y + vyNew)/2 * dt
+            self.position.z += (self.velocity3D.z + vzNew)/2 * dt
+            
+            self.velocity3D.x = vxNew
+            self.velocity3D.y = vyNew
+            self.velocity3D.z = vzNew
+            
+            // 4. 三维欧氏距离
+            self.distance3D = sqrt(self.position.x*self.position.x +
+                                   self.position.y*self.position.y +
+                                   self.position.z*self.position.z)
+            
+            // 5. 阻尼处理，减少漂移
+            if accelMagnitude < self.noiseThreshold {
+                self.velocity *= self.velocityDamping
+                self.velocity3D *= self.velocityDamping
+            }
         }
     }
     
