@@ -8,9 +8,12 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     // GPS 原始定位数据（经纬度）
     @Published var lastLocation: CLLocation?
-    
-    // GPS 初始绝对高度
-    @Published var initialAltitude: Double?
+    // 初始空间点（使用 CLLocation 存储包含海拔的三维信息）
+    @Published var initialLocation: CLLocation?
+    // 当前空间点
+    @Published var currentLocation: CLLocation?
+    // 起点到当前位置的欧氏距离（米）
+    @Published var distanceFromStart: Double = 0.0
     
     override init() {
         super.init()
@@ -30,14 +33,39 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-        
-        // 记录最新定位
         lastLocation = location
+        currentLocation = location
         
-        // 如果还没有记录初始高度，则记录第一次有效的高度数据
-        if initialAltitude == nil && location.verticalAccuracy > 0 {
-            initialAltitude = location.altitude
+        // 记录初始空间点，要求垂直精度有效（>0表示数据可信）
+        if initialLocation == nil && location.verticalAccuracy > 0 {
+            initialLocation = location
         }
+        
+        // 计算欧氏距离
+        if let start = initialLocation {
+            distanceFromStart = LocationManager.euclideanDistance(from: start, to: location)
+        }
+    }
+
+    /// 计算空间两点的欧氏距离（单位：米）
+    static func euclideanDistance(from: CLLocation, to: CLLocation) -> Double {
+        // 经纬度转为弧度
+        let lat1 = from.coordinate.latitude * .pi / 180
+        let lon1 = from.coordinate.longitude * .pi / 180
+        let lat2 = to.coordinate.latitude * .pi / 180
+        let lon2 = to.coordinate.longitude * .pi / 180
+        // 地球半径（米）
+        let R = 6371000.0
+        // 水平距离（Haversine公式）
+        let dLat = lat2 - lat1
+        let dLon = lon2 - lon1
+        let a = sin(dLat/2) * sin(dLat/2) + cos(lat1) * cos(lat2) * sin(dLon/2) * sin(dLon/2)
+        let c = 2 * atan2(sqrt(a), sqrt(1-a))
+        let horizontal = R * c
+        // 垂直距离
+        let dz = to.altitude - from.altitude
+        // 三维欧氏距离
+        return sqrt(horizontal * horizontal + dz * dz)
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
