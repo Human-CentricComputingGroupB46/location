@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>我们需要使用GPS定位来获取您当前的基础海拔高度信息。</string>
+	<key>NSMotionUsageDescription</key>
+	<string>我们需要访问运动传感器与气压计来计算您的相对位移和楼层变化。</string>
+</dict>
+</plist>

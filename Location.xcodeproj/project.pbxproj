@@ -41,9 +41,22 @@
 		18991CDA2F6735A6006C9121 /* SensorKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SensorKit.framework; path = System/Library/Frameworks/SensorKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		18991CEA2F673B29006C9121 /* Exceptions for "Location" folder in "Location" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 18991C9F2F673026006C9121 /* Location */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		18991CA22F673026006C9121 /* Location */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				18991CEA2F673B29006C9121 /* Exceptions for "Location" folder in "Location" target */,
+			);
 			path = Location;
 			sourceTree = "<group>";
 		};
@@ -429,6 +442,12 @@
 				DEVELOPMENT_TEAM = U25A7T7GPN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Location/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Get your location for navigator";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "我们需要使用GPS定位来获取您当前的基础海拔高度信息。";
+				INFOPLIST_KEY_NSMotionUsageDescription = "我们需要访问运动传感器与气压计来计算您的相对位移和楼层变化。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -461,6 +480,12 @@
 				DEVELOPMENT_TEAM = U25A7T7GPN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Location/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Get your location for navigator";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "我们需要使用GPS定位来获取您当前的基础海拔高度信息。";
+				INFOPLIST_KEY_NSMotionUsageDescription = "我们需要访问运动传感器与气压计来计算您的相对位移和楼层变化。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
