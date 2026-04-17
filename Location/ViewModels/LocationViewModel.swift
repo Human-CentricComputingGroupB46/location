@@ -26,7 +26,7 @@ class LocationViewModel: ObservableObject {
     // Models（核心数据）
     private var barometerManager = BarometerManager()
     private var locationManager = LocationManager()
-    private var accelerometerManager = AccelerometerManager()
+    let accelerometerManager = AccelerometerManager() // 暴露给外部图表使用
     private var networkManager = NetworkManager()
     
     private var cancellables = Set<AnyCancellable>()
@@ -82,6 +82,16 @@ class LocationViewModel: ObservableObject {
     }
     
     private func bindLocation() {
+        locationManager.$currentHeading
+            .receive(on: RunLoop.main)
+            .sink { [weak self] heading in
+                guard let self = self, let heading = heading else { return }
+                // 优先使用真实地理航向校准，如果没有则用磁北航向
+                let degrees = heading.trueHeading > 0 ? heading.trueHeading : heading.magneticHeading
+                self.accelerometerManager.currentHeading = degrees
+            }
+            .store(in: &cancellables)
+            
         locationManager.$lastLocation
             .receive(on: RunLoop.main)
             .map { location -> String in

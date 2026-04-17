@@ -14,21 +14,30 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var currentLocation: CLLocation?
     // 起点到当前位置的欧氏距离（米）
     @Published var distanceFromStart: Double = 0.0
+    // 指南针/磁场方向数据（用于提供给加速度等其他模块判断移动方向）
+    @Published var currentHeading: CLHeading?
     
     override init() {
         super.init()
         manager.delegate = self
         // 提高定位精度以获得更准确的初始高度
         manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.headingFilter = kCLHeadingFilterNone // 任何角度变化都通知，或者可以设置小角度如 1.0
         manager.requestWhenInUseAuthorization()
     }
     
     func startUpdating() {
         manager.startUpdatingLocation()
+        if CLLocationManager.headingAvailable() {
+            manager.startUpdatingHeading()
+        }
     }
     
     func stopUpdating() {
         manager.stopUpdatingLocation()
+        if CLLocationManager.headingAvailable() {
+            manager.stopUpdatingHeading()
+        }
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -66,6 +75,13 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         let dz = to.altitude - from.altitude
         // 三维欧氏距离
         return sqrt(horizontal * horizontal + dz * dz)
+    }
+    
+    // 获取指南针朝向数据
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        // newHeading.trueHeading 或 newHeading.magneticHeading 都可以用来表示朝向
+        // 其中 trueHeading 是地理正北方向（需开启GPS定位配合计算磁偏角），为负数时代表数据无效
+        currentHeading = newHeading
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
