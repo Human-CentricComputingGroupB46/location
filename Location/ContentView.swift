@@ -112,38 +112,36 @@ struct AccelerationChartView: View {
             // 获取最新时间作为基准（0秒）
             let latestTime = accelerometerManager.chartData.last?.timestamp ?? 0
             
-            Chart {
-                ForEach(accelerometerManager.chartData) { dataPoint in
-                    // 计算相对时间，最新点为 0，旧点为负数 (例如：-3.0s 到 0s)
-                    let relativeTime = dataPoint.timestamp - latestTime
-                    
-                    // X轴 加速度
-                    LineMark(
-                        x: .value("Time", relativeTime),
-                        y: .value("X", dataPoint.x),
-                        series: .value("Axis", "X")
-                    )
-                    .foregroundStyle(.red)
-                    .lineStyle(StrokeStyle(lineWidth: 1.5))
-                    
-                    // Y轴 加速度
-                    LineMark(
-                        x: .value("Time", relativeTime),
-                        y: .value("Y", dataPoint.y),
-                        series: .value("Axis", "Y")
-                    )
-                    .foregroundStyle(.green)
-                    .lineStyle(StrokeStyle(lineWidth: 1.5))
-                    
-                    // Z轴 加速度
-                    LineMark(
-                        x: .value("Time", relativeTime),
-                        y: .value("Z", dataPoint.z),
-                        series: .value("Axis", "Z")
-                    )
-                    .foregroundStyle(.blue)
-                    .lineStyle(StrokeStyle(lineWidth: 1.5))
-                }
+            Chart(accelerometerManager.chartData) { dataPoint in
+                // 计算相对时间，最新点为 0，旧点为负数 (例如：-3.0s 到 0s)
+                let relativeTime = dataPoint.timestamp - latestTime
+                
+                // X轴 加速度
+                LineMark(
+                    x: .value("Time", relativeTime),
+                    y: .value("X", dataPoint.x),
+                    series: .value("Axis", "X")
+                )
+                .foregroundStyle(.red)
+                .lineStyle(StrokeStyle(lineWidth: 1.5))
+                
+                // Y轴 加速度
+                LineMark(
+                    x: .value("Time", relativeTime),
+                    y: .value("Y", dataPoint.y),
+                    series: .value("Axis", "Y")
+                )
+                .foregroundStyle(.green)
+                .lineStyle(StrokeStyle(lineWidth: 1.5))
+                
+                // Z轴 加速度
+                LineMark(
+                    x: .value("Time", relativeTime),
+                    y: .value("Z", dataPoint.z),
+                    series: .value("Axis", "Z")
+                )
+                .foregroundStyle(.blue)
+                .lineStyle(StrokeStyle(lineWidth: 1.5))
             }
             .chartXScale(domain: -3.0 ... 0.0) // 强制固定显示窗口为最近 3 秒
             .chartXAxis {
