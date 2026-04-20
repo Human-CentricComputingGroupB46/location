@@ -29,6 +29,10 @@ class LocationViewModel: ObservableObject {
     let accelerometerManager = AccelerometerManager() // 暴露给外部图表使用
     private var networkManager = NetworkManager()
     
+    /// 导航模块需要访问的传感器引用
+    var barometerManagerRef: BarometerManager { barometerManager }
+    var locationManagerRef: LocationManager { locationManager }
+    
     private var cancellables = Set<AnyCancellable>()
     
     init() {

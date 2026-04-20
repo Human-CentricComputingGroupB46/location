@@ -9,7 +9,7 @@ import SwiftUI
 import Charts
 
 struct ContentView: View {
-    @StateObject private var viewModel = LocationViewModel()
+    @EnvironmentObject var viewModel: LocationViewModel
     
     var body: some View {
         ScrollView {
@@ -91,6 +91,7 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(LocationViewModel())
 }
 
 // 独立的图表 View 组件，附加到当前文件避免修改工程结构
