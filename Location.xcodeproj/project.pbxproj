@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		18991CDC2F6735B9006C9121 /* SensorKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18991CDA2F6735A6006C9121 /* SensorKit.framework */; };
 		18991CDF2F6735BA006C9121 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18991CD82F673510006C9121 /* CoreMotion.framework */; };
 		18991CE12F6735BC006C9121 /* CoreLocationUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18991CD42F673508006C9121 /* CoreLocationUI.framework */; };
 		18991CE32F6735BE006C9121 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18991CD52F673508006C9121 /* CoreLocation.framework */; };
@@ -38,7 +37,6 @@
 		18991CD42F673508006C9121 /* CoreLocationUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocationUI.framework; path = System/Library/Frameworks/CoreLocationUI.framework; sourceTree = SDKROOT; };
 		18991CD52F673508006C9121 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		18991CD82F673510006C9121 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
-		18991CDA2F6735A6006C9121 /* SensorKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SensorKit.framework; path = System/Library/Frameworks/SensorKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -79,7 +77,7 @@
 			files = (
 				18991CE32F6735BE006C9121 /* CoreLocation.framework in Frameworks */,
 				18991CE12F6735BC006C9121 /* CoreLocationUI.framework in Frameworks */,
-				18991CDC2F6735B9006C9121 /* SensorKit.framework in Frameworks */,
+
 				18991CDF2F6735BA006C9121 /* CoreMotion.framework in Frameworks */,
 				18991CE72F673819006C9121 /* CoreLocationUI.framework in Frameworks */,
 			);
@@ -126,7 +124,6 @@
 		18991CD32F673508006C9121 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				18991CDA2F6735A6006C9121 /* SensorKit.framework */,
 				18991CD82F673510006C9121 /* CoreMotion.framework */,
 				18991CD52F673508006C9121 /* CoreLocation.framework */,
 				18991CD42F673508006C9121 /* CoreLocationUI.framework */,
@@ -364,7 +361,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -422,7 +419,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -518,7 +515,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U25A7T7GPN;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Occ.LocationTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -540,7 +537,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U25A7T7GPN;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Occ.LocationTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

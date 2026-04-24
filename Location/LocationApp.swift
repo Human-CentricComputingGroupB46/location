@@ -24,7 +24,7 @@ struct LocationApp: App {
 /// 主 Tab 容器 — 在此处创建 NavigationViewModel 以保持生命周期稳定
 struct MainTabView: View {
     @EnvironmentObject var locationVM: LocationViewModel
-    @StateObject private var navVM: NavigationViewModel = .placeholder
+    @StateObject private var navVM = NavigationViewModel()
     @State private var didInit = false
     
     var body: some View {
@@ -40,11 +40,12 @@ struct MainTabView: View {
                 }
         }
         .onAppear {
-            if !didInit {
-                navVM.bindSensors(barometer: locationVM.barometerManagerRef,
-                                  location: locationVM.locationManagerRef)
-                didInit = true
-            }
+            guard !didInit else { return }
+            didInit = true
+            navVM.bindSensors(barometer: locationVM.barometerManagerRef,
+                              location: locationVM.locationManagerRef)
+            // 进入应用即启动定位与气压追踪，两个模块共享同一组传感器
+            locationVM.startAllTracking()
         }
     }
 }

@@ -11,6 +11,7 @@ final class NavigationViewModel: ObservableObject {
     @Published var destinationCode: String = ""          // e.g. "EB102"
     @Published var viewFloor: Int = 1                    // 当前查看的楼层
     @Published var showSatelliteMap: Bool = false         // 卫星地图图层开关
+    @Published var autoFollowFloor: Bool = true           // 楼层自动跟随气压计
     
     // MARK: - 导航状态
     
@@ -30,6 +31,26 @@ final class NavigationViewModel: ObservableObject {
     
     @Published var sensorFloor: Int = 1                  // 气压计推算楼层
     @Published var userLocalPosition: CGPoint?           // GPS 投影到局部坐标
+    @Published var userHeading: Double?                  // 指南针方向（度，正北=0）
+    @Published var isTracking: Bool = false              // 传感器是否正在运行
+    
+    /// 用户是否在建筑平面范围内（GPS 判断）
+    var userInBuilding: Bool {
+        guard let p = userLocalPosition else { return false }
+        return p.x > 0 && p.x < BuildingData.mapConfig.width
+            && p.y > 0 && p.y < BuildingData.mapConfig.height
+    }
+    
+    /// 用户到当前目的地的直线距离（米），nil 表示无路线或用户不在室内
+    var distanceToDestination: Double? {
+        guard userInBuilding, let pos = userLocalPosition,
+              let destCode = route.map({ _ in destinationCode }),
+              let destRoom = BuildingData.room(byCode: destCode) else { return nil }
+        let destPt = BuildingData.geoToLocal(lat: destRoom.lat, lng: destRoom.lng)
+        let dx = pos.x - destPt.x
+        let dy = pos.y - destPt.y
+        return hypot(dx, dy) / BuildingData.geoReference.unitsPerMeter
+    }
     
     // MARK: - 数据
     
@@ -42,22 +63,10 @@ final class NavigationViewModel: ObservableObject {
     
     // MARK: - Init
     
-    init(barometerManager: BarometerManager, locationManager: LocationManager) {
-        self.barometerManager = barometerManager
-        self.locationManager = locationManager
-        self.graph = NavigationGraph()
-        self.allRoomCodes = BuildingData.allRoomCodes()
-        
-        bindSensorsInternal()
-    }
-    
-    /// 用于 @StateObject 的占位初始化
-    private init() {
+    init() {
         self.graph = NavigationGraph()
         self.allRoomCodes = BuildingData.allRoomCodes()
     }
-    
-    static let placeholder = NavigationViewModel()
     
     /// 延迟绑定传感器（从 MainTabView.onAppear 调用）
     func bindSensors(barometer: BarometerManager, location: LocationManager) {
@@ -163,25 +172,45 @@ final class NavigationViewModel: ObservableObject {
     private func bindSensorsInternal() {
         cancellables.removeAll()
         
-        // 气压计 → 楼层
+        // 气压计 → 楼层（可自动跟随）
         barometerManager?.$floorCount
             .receive(on: DispatchQueue.main)
             .sink { [weak self] count in
+                guard let self else { return }
                 let floor = BuildingData.sensorConfig.baseFloor + count
                 let clamped = max(BuildingData.allFloors.first ?? 1,
                                   min(BuildingData.allFloors.last ?? 3, floor))
-                self?.sensorFloor = clamped
+                self.sensorFloor = clamped
+                if self.autoFollowFloor {
+                    self.viewFloor = clamped
+                }
             }
             .store(in: &cancellables)
         
-        // GPS → 局部坐标
+        // GPS → 局部坐标 + isTracking 状态
         locationManager?.$lastLocation
-            .compactMap { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] loc in
-                let pt = BuildingData.geoToLocal(lat: loc.coordinate.latitude,
-                                                  lng: loc.coordinate.longitude)
-                self?.userLocalPosition = pt
+                guard let self else { return }
+                if let loc {
+                    let pt = BuildingData.geoToLocal(lat: loc.coordinate.latitude,
+                                                     lng: loc.coordinate.longitude)
+                    self.userLocalPosition = pt
+                    self.isTracking = true
+                } else {
+                    self.userLocalPosition = nil
+                    self.isTracking = false
+                }
+            }
+            .store(in: &cancellables)
+        
+        // 指南针方向 → userHeading
+        locationManager?.$currentHeading
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] heading in
+                let degrees = heading.trueHeading > 0 ? heading.trueHeading : heading.magneticHeading
+                self?.userHeading = degrees
             }
             .store(in: &cancellables)
     }

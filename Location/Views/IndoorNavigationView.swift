@@ -32,6 +32,7 @@ struct IndoorNavigationView: View {
                 
                 ForEach(BuildingData.allFloors, id: \.self) { floor in
                     Button {
+                        vm.autoFollowFloor = false   // 手动切换后暂停自动跟随
                         vm.switchFloor(floor)
                     } label: {
                         Text("\(floor)F")
@@ -60,10 +61,26 @@ struct IndoorNavigationView: View {
                         .cornerRadius(6)
                 }
                 
-                // 传感器楼层
+                // 楼层自动跟随按钮
+                Button {
+                    vm.autoFollowFloor.toggle()
+                    if vm.autoFollowFloor {
+                        vm.switchFloor(vm.sensorFloor)
+                    }
+                } label: {
+                    Image(systemName: vm.autoFollowFloor ? "location.fill" : "location.slash")
+                        .font(.system(size: 13))
+                        .foregroundColor(vm.autoFollowFloor ? .white : .secondary)
+                        .padding(6)
+                        .background(vm.autoFollowFloor ? Color.blue : Color(.systemGray5))
+                        .cornerRadius(6)
+                }
+                
+                // 传感器楼层 + 定位状态
                 HStack(spacing: 4) {
-                    Image(systemName: "sensor.fill")
-                        .font(.system(size: 10))
+                    Circle()
+                        .fill(vm.isTracking ? Color.green : Color.gray)
+                        .frame(width: 6, height: 6)
                     Text("\(vm.sensorFloor)F")
                         .font(.caption2)
                 }

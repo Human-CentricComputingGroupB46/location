@@ -173,13 +173,36 @@ struct BuildingMapView: View {
         guard pos.x >= 0 && pos.x <= mapSize.width && pos.y >= 0 && pos.y <= mapSize.height else { return }
         
         // 外圈（精度光晕）
-        let outerR: Double = 12
+        let outerR: Double = 14
         let outerCircle = Path(ellipseIn: CGRect(x: pos.x - outerR, y: pos.y - outerR,
                                                    width: outerR * 2, height: outerR * 2))
-        context.fill(outerCircle, with: .color(.blue.opacity(0.15)))
+        context.fill(outerCircle, with: .color(.blue.opacity(0.18)))
+        
+        // 方向箭头（如果有指南针数据）
+        if let heading = vm.userHeading {
+            let arrowLen: Double = 14
+            // heading 是相对于正北的角度，需映射到画布（画布 y 轴向下，正北 = 上 = -y 方向）
+            let rad = heading * .pi / 180
+            let tip = CGPoint(x: pos.x + arrowLen * sin(rad), y: pos.y - arrowLen * cos(rad))
+            var arrowPath = Path()
+            arrowPath.move(to: pos)
+            arrowPath.addLine(to: tip)
+            context.stroke(arrowPath, with: .color(.blue.opacity(0.85)),
+                           style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+            // 箭头尖端小三角
+            let sideLen: Double = 4
+            let rad1 = (heading + 140) * .pi / 180
+            let rad2 = (heading - 140) * .pi / 180
+            var triangle = Path()
+            triangle.move(to: tip)
+            triangle.addLine(to: CGPoint(x: tip.x + sideLen * sin(rad1), y: tip.y - sideLen * cos(rad1)))
+            triangle.addLine(to: CGPoint(x: tip.x + sideLen * sin(rad2), y: tip.y - sideLen * cos(rad2)))
+            triangle.closeSubpath()
+            context.fill(triangle, with: .color(.blue))
+        }
         
         // 内圈（用户点）
-        let innerR: Double = 5
+        let innerR: Double = 6
         let innerCircle = Path(ellipseIn: CGRect(x: pos.x - innerR, y: pos.y - innerR,
                                                    width: innerR * 2, height: innerR * 2))
         context.fill(innerCircle, with: .color(.blue))
